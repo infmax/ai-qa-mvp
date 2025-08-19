@@ -1,0 +1,35 @@
+# виртуальное окружение
+.venv/
+venv/
+ENV/
+env/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.pdb
+*.egg-info/
+*.egg
+*.manifest
+*.spec
+
+# IDE
+.vscode/
+.idea/
+
+# логи и артефакты
+*.log
+*.tmp
+*.swp
+
+# Playwright downloads / cache
+playwright/.cache/
+test-results/
+screenshots/
+videos/
+
+# системные файлы
+.DS_Store
+Thumbs.db

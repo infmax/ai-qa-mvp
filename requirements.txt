@@ -1,0 +1,22 @@
+# базовые
+pydantic>=2.7
+anyio>=4.4
+tenacity>=8.2
+
+# работа с HTML
+beautifulsoup4>=4.12
+lxml>=5.2
+
+# автотесты
+playwright>=1.46
+
+# LLM / OpenAI
+openai>=1.30
+
+# граф для оркестрации
+langgraph>=0.2
+langchain-core>=0.2   # langgraph зависит от core
+langchain-openai>=0.1 # для совместимости (если понадобится)
+
+# утилиты
+tqdm>=4.66
