@@ -5,11 +5,15 @@ from context import PlaywrightDriver
 from parser import parse_test_case
 from graph import build_graph
 from models import ExecResult
+import os
+
+BASE_URL = os.getenv("BASE_URL")
 
 DEFAULT_TEST = """
 1. Дано: пользователь на главной. Что сделать: Открыть реестр уязвимостей. Результат: Реестр открыт.
 2. Дано: Реестр открыт. Что сделать: Применить фильтры по критичности. Результат: Фильтры применены.
 """
+
 
 def _print_step_result(step_idx: int, res: ExecResult):
     border = "=" * 60
@@ -24,11 +28,18 @@ def _print_step_result(step_idx: int, res: ExecResult):
         for i, e in enumerate(res.errors, 1):
             msg = f"[{e.code}] {e.message}"
             if e.details:
-                det = {k: (str(v)[:180] + "…") if isinstance(v, str) and len(str(v)) > 180 else v
-                       for k, v in e.details.items()}
+                det = {
+                    k: (
+                        (str(v)[:180] + "…")
+                        if isinstance(v, str) and len(str(v)) > 180
+                        else v
+                    )
+                    for k, v in e.details.items()
+                }
                 msg += f" | details={det}"
             print(f"  {i}. {msg}")
     print(border)
+
 
 async def run_test(test_text: str):
     steps = parse_test_case(test_text)
@@ -38,6 +49,11 @@ async def run_test(test_text: str):
 
     driver = PlaywrightDriver(headless=True)
     await driver.start()
+
+    if BASE_URL:
+        print(f"Открываем главную страницу: {BASE_URL}")
+        await driver.page.goto(BASE_URL)
+
     try:
         state = {
             "steps": steps,
@@ -56,7 +72,13 @@ async def run_test(test_text: str):
             _print_step_result(current_step_number, res)
 
             if not res.ok:
-                ans = input("Шаг завершился с ошибками. Продолжить к следующему шагу? [y/n]: ").strip().lower()
+                ans = (
+                    input(
+                        "Шаг завершился с ошибками. Продолжить к следующему шагу? [y/n]: "
+                    )
+                    .strip()
+                    .lower()
+                )
                 if ans not in ("y", "yes", ""):
                     print("Остановлено по запросу пользователя.")
                     break
@@ -64,6 +86,7 @@ async def run_test(test_text: str):
         print("\nТЕСТ ЗАВЕРШЁН.")
     finally:
         await driver.stop()
+
 
 if __name__ == "__main__":
     if len(sys.argv) > 1:
